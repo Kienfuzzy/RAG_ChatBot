@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Local uploads or runtime data
+test_fastapi/__pycache__/
+app/__pycache__/
+app/routers/__pycache__/
+app/uploads/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python egg files
+*.egg-info/
+
+dist/
+build/
+
+# VSCode settings (optional)
+.vscode/
