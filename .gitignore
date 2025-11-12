@@ -14,6 +14,7 @@ app/uploads/
 # Environment variables and secrets
 .env
 .env.*
+config.py
 
 # OS files
 .DS_Store
@@ -27,3 +28,6 @@ build/
 
 # VSCode settings (optional)
 .vscode/
+
+# Qdrant storage files
+qdrant_storage/

@@ -1,52 +1,59 @@
-# RAG Chatbot - FastAPI Project
+# RAG System - FastAPI + Qdrant
 
-## Local Development Setup (No Docker)
+A semantic search system built with FastAPI and Qdrant. Search through startup data using natural language queries.
 
-### 1. Create and activate a virtual environment
-On macOS/Linux:
-```sh
-python3 -m venv venv
-source venv/bin/activate
-```
-On Windows:
-```sh
-python -m venv venv
-venv\Scripts\activate
-```
+## Features
 
-### 2. Install dependencies
-```sh
+- 🔍 Neural search with Sentence Transformers
+- 🚀 FastAPI with automatic docs
+- 📊 Qdrant vector database
+- 🐳 Docker support
+
+## Quick Setup
+
+```bash
+# 1. Install dependencies
 pip install -r requirements.txt
-```
 
-### 3. Run the FastAPI app
-Option 1: Using Uvicorn
-```sh
+# 2. Start Qdrant
+docker run -p 6333:6333 qdrant/qdrant
+
+# 3. Prepare data
+cd scripts
+python prepare_data.py
+python upload_to_qdrant.py
+
+# 4. Run API
 uvicorn app.main:app --reload
 ```
-Option 2: Using FastAPI's built-in dev server (FastAPI >= 0.110.0)
-```sh
-fastapi dev app/main.py
+
+**Visit:** http://localhost:8000/docs
+
+## Usage
+
+**Search startups:**
+```bash
+curl -X POST "http://localhost:8000/neural-search/search" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "AI startup", "limit": 5}'
 ```
 
-- Access the docs at: [http://localhost:8000/docs](http://localhost:8000/docs)
+## Project Structure
 
----
-
-## Docker Setup (Recommended)
-
-### 1. Build the Docker image
-```sh
-docker build -t rag-chatbot .
+```
+├── app/                   # FastAPI application
+│   ├── main.py           # API entry point
+│   ├── routers/          # API endpoints
+│   └── services/         # Business logic
+├── scripts/              # Data preparation
+├── test_fastapi/         # FastAPI tutorials
+├── test_qdrant/          # Qdrant tutorials
+└── data/                 # Dataset storage
 ```
 
-### 2. Run the Docker container
-```sh
-docker run -p 8000:8000 rag-chatbot
-```
+## Technologies
 
-- Access the docs at: [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-**Choose either local or Docker setup. No need to do both!**
+- FastAPI - Web framework
+- Qdrant - Vector database
+- Sentence Transformers - Text embeddings
+- Docker - Containerization
