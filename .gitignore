@@ -31,3 +31,6 @@ build/
 
 # Qdrant storage files
 qdrant_storage/
+
+# 
+startup_vectors.npy

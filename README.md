@@ -12,16 +12,22 @@ A semantic search system built with FastAPI and Qdrant. Search through startup d
 ## Quick Setup
 
 ```bash
-# 1. Install dependencies
+# 1. Activate Vm and install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
 
 # 2. Start Qdrant
-docker run -p 6333:6333 qdrant/qdrant
+# Use the --name flag to avoid duplicate containers
+# This ensures the container is named 'qdrant' and reuses the same volume
+
+docker run --name qdrant -p 6333:6333 -v qdrant_data:/qdrant/storage qdrant/qdrant
+
+# To restart the container in the future, use:
+docker start qdrant
 
 # 3. Prepare data
-cd scripts
-python prepare_data.py
-python upload_to_qdrant.py
+python scripts/prepare_data.py
+python scripts/upload_to_qdrant.py
 
 # 4. Run API
 uvicorn app.main:app --reload

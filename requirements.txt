@@ -8,3 +8,6 @@ sentence-transformers
 numpy
 pandas
 tqdm
+langchain_community
+langchain
+unstructured
