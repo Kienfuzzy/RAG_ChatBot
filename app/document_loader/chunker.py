@@ -27,39 +27,69 @@ def chunk_text(text, chunk_size=500, overlap=50):
         
     return chunks
 
-def chunk_documents(documents, chunk_size=500, overlap=50):
+def chunk_document(document, chunk_size=500, overlap=50):
     """
-    Chunk a list of documents (like startup data)
+    Chunk a single Document object (works with any document type)
     
     Args:
-        documents (list): List of document dictionaries
+        document: Document object with page_content and metadata
         chunk_size (int): Maximum size of each chunk
         overlap (int): Number of characters to overlap between chunks
     
     Returns:
-        list: List of chunked documents with metadata
+        list: List of chunked documents with preserved metadata
     """
+    # Handle both Document objects and plain text
+    if hasattr(document, 'page_content'):
+        text_content = document.page_content
+        base_metadata = document.metadata.copy()
+    else:
+        # Fallback for plain text
+        text_content = str(document)
+        base_metadata = {}
+    
+    if not text_content.strip():
+        return []
+    
+    chunks = chunk_text(text_content, chunk_size, overlap)
     chunked_documents = []
     
-    for doc_index, doc in enumerate(documents):
-        text_content = doc.get('description', '')
+    for chunk_index, chunk in enumerate(chunks):
+        chunk_metadata = {
+            **base_metadata,  # Preserve original metadata
+            'chunk_index': chunk_index,
+            'total_chunks': len(chunks),
+            'chunk_size': len(chunk)
+        }
         
-        if not text_content:
-            continue
-    
-        chunks = chunk_text(text_content, chunk_size, overlap)
-        for chunk_index, chunk in enumerate(chunks):
-            chunked_doc = {
-                'id': f"doc_{doc_index}_chunk_{chunk_index}",
-                'content': chunk,
-                'original_name': doc.get('name', 'Unknown'),
-                'original_city': doc.get('city', 'Unknown'),
-                'chunk_index': chunk_index,
-                'total_chunks': len(chunks)
-            }
-            chunked_documents.append(chunked_doc)
+        # Create a simple dict for backward compatibility
+        chunked_doc = {
+            'content': chunk,
+            'metadata': chunk_metadata
+        }
+        chunked_documents.append(chunked_doc)
     
     return chunked_documents
+
+def chunk_documents(documents, chunk_size=500, overlap=50):
+    """
+    Chunk a list of documents (works with any document type)
+    
+    Args:
+        documents (list): List of Document objects or text strings
+        chunk_size (int): Maximum size of each chunk
+        overlap (int): Number of characters to overlap between chunks
+    
+    Returns:
+        list: List of all chunked documents
+    """
+    all_chunked_docs = []
+    
+    for document in documents:
+        chunked_docs = chunk_document(document, chunk_size, overlap)
+        all_chunked_docs.extend(chunked_docs)
+    
+    return all_chunked_docs
 
 # Example usage
 if __name__ == "__main__":

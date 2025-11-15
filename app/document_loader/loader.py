@@ -1,60 +1,78 @@
 import os
-import json
+from datetime import datetime
+from langchain_community.document_loaders import UnstructuredFileLoader
 
-def load_json_file(file_path):
+def load_text_file(file_path):
     """
-    Simple function to load a JSON Lines file (each line is a JSON object)
+    Load a text file using UnstructuredFileLoader
     
     Args:
-        file_path (str): Path to the JSON file
+        file_path (str): Path to the text file (.txt, .md)
     
     Returns:
-        list: List of documents loaded from the file
+        Document: Document object with page_content and metadata
     """
-    documents = []
-    
-    with open(file_path, 'r') as file:
-        for line in file:
-            if line.strip():  # Skip empty lines
-                document = json.loads(line)
-                documents.append(document)
-    
-    return documents
+    try:
+        loader = UnstructuredFileLoader(file_path)
+        documents = loader.load()
+        
+        if documents:
+            # UnstructuredFileLoader returns a list, take the first document
+            document = documents[0]
+            # Add additional metadata
+            document.metadata.update({
+                'file_size': os.path.getsize(file_path),
+                'loaded_at': datetime.now().isoformat(),
+                'filename': os.path.basename(file_path),
+                'file_type': os.path.splitext(file_path)[1]
+            })
+            return document
+        else:
+            print(f"No content found in {file_path}")
+            return None
+        
+    except Exception as e:
+        print(f"Error loading {file_path}: {e}")
+        return None
 
 def load_documents_from_directory(directory_path):
     """
-    Load all JSON files from a directory
+    Load all text files from a directory
     
     Args:
-        directory_path (str): Path to the directory containing JSON files
+        directory_path (str): Path to the directory containing text files
     
     Returns:
-        list: List of all documents from all JSON files
+        list: List of Document objects from all text files
     """
-    all_documents = []
+    documents = []
+    supported_extensions = ['.txt', '.md']
     
     for filename in os.listdir(directory_path):
-        if filename.endswith('.json'):
+        file_extension = os.path.splitext(filename)[1].lower()
+        if file_extension in supported_extensions:
             file_path = os.path.join(directory_path, filename)
-            documents = load_json_file(file_path)
-            all_documents.extend(documents)
-            print(f"Loaded {len(documents)} documents from {filename}")
+            document = load_text_file(file_path)
+            if document:
+                documents.append(document)
+                print(f"Loaded document from {filename} ({document.metadata['file_size']} bytes)")
     
-    return all_documents
+    return documents
 
 # Example usage
 if __name__ == "__main__":
-    # Define the path to the data directory
-    DATA_DIR = os.path.join(os.path.dirname(__file__), "../../data")
+    # Test with your test documents directory
+    test_dir = "../../test_documents"
     
-    # Load all documents from the data directory
-    documents = load_documents_from_directory(DATA_DIR)
-    
-    print(f"Total documents loaded: {len(documents)}")
-    
-    # Show example of first document
-    if documents:
-        print("\nExample document:")
-        print(f"Name: {documents[0].get('name', 'N/A')}")
-        print(f"Description: {documents[0].get('description', 'N/A')[:100]}...")
-        print(f"City: {documents[0].get('city', 'N/A')}")
+    if os.path.exists(test_dir):
+        documents = load_documents_from_directory(test_dir)
+        print(f"Total documents loaded: {len(documents)}")
+        
+        # Show example of first document
+        if documents:
+            print("\nExample document:")
+            print(f"Filename: {documents[0].metadata.get('filename', 'N/A')}")
+            print(f"File size: {documents[0].metadata.get('file_size', 'N/A')} bytes")
+            print(f"Content preview: {documents[0].page_content[:100]}...")
+    else:
+        print(f"Test directory not found: {test_dir}")

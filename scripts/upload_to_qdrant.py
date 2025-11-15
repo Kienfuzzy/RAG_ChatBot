@@ -11,15 +11,16 @@ collection_name = "startups"
 
 print(f"Checking if collection '{collection_name}' exists...")
 # Check if the collection exists
-if not client.collection_exists(collection_name):
-    print(f"Creating collection '{collection_name}'...")
-    client.create_collection(
-        collection_name=collection_name,
-        vectors_config=VectorParams(size=384, distance=Distance.COSINE),
-    )
-    print(f"Collection '{collection_name}' created")
-else:
-    print(f"Collection '{collection_name}' already exists")
+if client.collection_exists(collection_name):
+    print(f"Deleting collection '{collection_name}'...")
+    client.delete_collection(collection_name)
+    print(f"Collection '{collection_name}' deleted successfully.")
+print(f"Creating collection '{collection_name}'...")
+client.create_collection(
+    collection_name=collection_name,
+    vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
+)
+print(f"Collection '{collection_name}' created")
 
 print("Loading data and vectors...")
 # Load the startup data

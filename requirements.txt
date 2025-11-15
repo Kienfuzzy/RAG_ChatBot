@@ -11,3 +11,5 @@ tqdm
 langchain_community
 langchain
 unstructured
+openai
+langchain-unstructured
