@@ -55,7 +55,7 @@ async def upload_text_file(file: UploadFile = File(...)):
         if not any(file.filename.endswith(ext) for ext in allowed_extensions):
             raise HTTPException(status_code=400, detail=f"Only {', '.join(allowed_extensions)} files supported")
         
-        doc_id = str(uuid.uuid4())[:8]
+        doc_id = str(uuid.uuid4())
         temp_file_path = f"temp_{doc_id}{os.path.splitext(file.filename)[1]}"
         
         # Step 1: Save and load document

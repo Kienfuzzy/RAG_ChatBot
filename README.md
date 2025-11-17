@@ -31,6 +31,9 @@ python scripts/upload_to_qdrant.py
 
 # 4. Run API
 uvicorn app.main:app --reload
+
+# 5. Start chatbot UI
+streamlit run chatbot_ui.py
 ```
 
 **Visit:** http://localhost:8000/docs

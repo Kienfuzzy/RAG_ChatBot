@@ -1,7 +1,7 @@
 from openai import OpenAI
 from ..config import settings
 
-client = OpenAI(api_key=settings.OPENAI_API_KEY)
+client = OpenAI(api_key=settings.openai_api_key)
 
 def get_embeddings(texts, model="text-embedding-3-small", batch_size=100):
     """

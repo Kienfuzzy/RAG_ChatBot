@@ -12,4 +12,8 @@ langchain_community
 langchain
 unstructured
 openai
-langchain-unstructured
+streamlit
+python-dotenv
+requests
+dotenv
+poetry
