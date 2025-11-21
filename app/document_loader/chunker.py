@@ -39,10 +39,15 @@ def chunk_document(document, chunk_size=500, overlap=50):
     Returns:
         list: List of chunked documents with preserved metadata
     """
-    # Handle both Document objects and plain text
+    # Handle both Document objects, dicts, and plain text
     if hasattr(document, 'page_content'):
+        # Object with attributes (langchain Document)
         text_content = document.page_content
         base_metadata = document.metadata.copy()
+    elif isinstance(document, dict) and 'page_content' in document:
+        # Dict format (simple loader)
+        text_content = document['page_content']
+        base_metadata = document.get('metadata', {}).copy()
     else:
         # Fallback for plain text
         text_content = str(document)

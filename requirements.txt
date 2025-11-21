@@ -8,12 +8,11 @@ sentence-transformers
 numpy
 pandas
 tqdm
-langchain_community
-langchain
-unstructured
 openai
 streamlit
 python-dotenv
 requests
 dotenv
 poetry
+elasticsearch
+redis

@@ -1,35 +1,33 @@
 import os
 from datetime import datetime
-from langchain_community.document_loaders import UnstructuredFileLoader
 
 def load_text_file(file_path):
     """
-    Load a text file using UnstructuredFileLoader
+    Load a text file - SIMPLIFIED VERSION (no langchain to avoid slow imports)
     
     Args:
         file_path (str): Path to the text file (.txt, .md)
     
     Returns:
-        Document: Document object with page_content and metadata
+        dict: Document dict with content and metadata
     """
     try:
-        loader = UnstructuredFileLoader(file_path)
-        documents = loader.load()
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
         
-        if documents:
-            # UnstructuredFileLoader returns a list, take the first document
-            document = documents[0]
-            # Add additional metadata
-            document.metadata.update({
+        # Return simple dict structure that chunk_document can handle
+        document = {
+            'page_content': content,
+            'metadata': {
+                'source': file_path,
                 'file_size': os.path.getsize(file_path),
                 'loaded_at': datetime.now().isoformat(),
                 'filename': os.path.basename(file_path),
                 'file_type': os.path.splitext(file_path)[1]
-            })
-            return document
-        else:
-            print(f"No content found in {file_path}")
-            return None
+            }
+        }
+        
+        return document
         
     except Exception as e:
         print(f"Error loading {file_path}: {e}")

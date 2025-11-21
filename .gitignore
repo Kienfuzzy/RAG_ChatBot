@@ -4,6 +4,11 @@ __pycache__/
 
 # Virtual environment
 venv/
+.venv/
+
+# Redis database files
+dump.rdb
+*.rdb
 
 # Local uploads or runtime data
 test_fastapi/__pycache__/

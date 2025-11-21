@@ -11,7 +11,7 @@ app = FastAPI(
 
 app.include_router(users.router)
 app.include_router(items.router)
-app.include_router(vectors.router)
+# app.include_router(vectors.router)
 app.include_router(neural_search.router)
 app.include_router(documents.router)
 
