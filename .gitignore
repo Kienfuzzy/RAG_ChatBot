@@ -37,5 +37,10 @@ build/
 # Qdrant storage files
 qdrant_storage/
 
-# 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Vector/model files
 startup_vectors.npy
