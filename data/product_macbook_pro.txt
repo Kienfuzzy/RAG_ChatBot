@@ -1,0 +1,26 @@
+Apple MacBook Pro 14-inch M3 Pro
+Price: $1,999.00
+Category: Laptop - Premium
+
+Professional-grade performance meets stunning design. The MacBook Pro with M3 Pro chip delivers unprecedented power for creative professionals, developers, and power users.
+
+Key Features:
+- M3 Pro chip with 11-core CPU and 14-core GPU
+- 14.2-inch Liquid Retina XDR display (3024 x 1964, 600 nits)
+- 18GB unified memory, 512GB SSD storage
+- Up to 18 hours battery life
+- Three Thunderbolt 4 ports, HDMI, SD card slot, MagSafe 3
+- 1080p FaceTime HD camera with advanced image processing
+- Studio-quality six-speaker sound system
+
+Technical Specifications:
+Processor: Apple M3 Pro (11-core CPU, 14-core GPU)
+Display: 14.2-inch Liquid Retina XDR, 3024 x 1964
+Memory: 18GB unified memory
+Storage: 512GB SSD
+Ports: 3x Thunderbolt 4, HDMI, SD card, MagSafe 3
+Weight: 3.5 lbs (1.6 kg)
+
+Perfect for video editors, photographers, software developers, and creative professionals. Runs macOS Sonoma with full ecosystem integration. Native support for Final Cut Pro, Logic Pro, Xcode.
+
+1-year limited warranty, eligible for AppleCare+.

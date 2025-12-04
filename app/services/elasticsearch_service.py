@@ -2,6 +2,8 @@ from elasticsearch import Elasticsearch
 from typing import List, Dict, Any
 import numpy as np
 from ..config import settings
+from .openai_service import OpenAIService
+from datetime import datetime
 
 class ElasticsearchService:
     def __init__(self):
@@ -29,9 +31,7 @@ class ElasticsearchService:
     def store_document_chunks(self, document_id: str, chunks: List[str], title: str = "Untitled"):
         """Store document chunks with OpenAI embeddings in Elasticsearch. Embeddings are generated inside, matching QdrantService interface."""
         self._ensure_index_exists()
-        from .openai_service import get_embeddings
-        from datetime import datetime
-        embeddings = get_embeddings(chunks)
+        embeddings = OpenAIService().get_embeddings(chunks)
         for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
             # Ensure embedding is a list (OpenAI returns lists, not numpy arrays)
             if not isinstance(embedding, list):
@@ -51,11 +51,9 @@ class ElasticsearchService:
     
     def search(self, text: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Search for similar documents using OpenAI embeddings. Generates embeddings internally."""
-        self._ensure_index_exists()
-        from .openai_service import get_embeddings
-        
+        self._ensure_index_exists()        
         # Get embedding for query
-        query_embedding = get_embeddings([text])[0]
+        query_embedding = OpenAIService().get_embeddings([text])[0]
         
         # Ensure it's a list
         if not isinstance(query_embedding, list):

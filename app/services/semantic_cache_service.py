@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any
 import numpy as np
 from app.services.cache_service import cache
-from app.services.openai_service import get_embeddings
+from app.services.openai_service import OpenAIService
 
 
 class SemanticCacheService:
@@ -47,7 +47,7 @@ class SemanticCacheService:
         
         try:
             # Generate embedding for the query
-            query_embedding = get_embeddings([query])[0]
+            query_embedding = OpenAIService().get_embeddings([query])[0]
             
             # Get the index of all cached queries
             cache_index = self.cache.get("semantic_cache:index")
@@ -95,7 +95,8 @@ class SemanticCacheService:
         
         try:
             # Generate embedding
-            query_embedding = get_embeddings([query])[0]
+            from .openai_service import OpenAIService
+            query_embedding = OpenAIService().get_embeddings([query])[0]
             
             # Update the cache index
             cache_index = self.cache.get("semantic_cache:index") or {}

@@ -36,8 +36,19 @@ search_limit = st.sidebar.slider("Documents", 1, 10, 3)
 
 # Clear conversation button
 if st.sidebar.button("🗑️ Clear Conversation"):
-    st.session_state.memory.clear_session(st.session_state.session_id)
+    # Clear server-side memory via API
+    try:
+        requests.post(
+            f"{FASTAPI_URL}/agent/clear-session",
+            params={"session_id": st.session_state.session_id},
+            headers={"x-token": SECRET_TOKEN}
+        )
+    except Exception as e:
+        st.sidebar.error(f"Error clearing session: {str(e)}")
+    
+    # Clear UI messages
     st.session_state.messages = []
+    st.rerun()
     st.rerun()
 
 # Upload file
@@ -90,76 +101,64 @@ if prompt := st.chat_input("Ask about your documents..."):
     with st.chat_message("user"):
         st.write(prompt)
     
-    # Get context from RAG if enabled
-    context = ""
-    query_info = ""
+    # Use agent endpoint if RAG is enabled
     if enable_rag:
         try:
             response = requests.post(
-                f"{FASTAPI_URL}/documents/search-hybrid",
+                f"{FASTAPI_URL}/agent/query",
                 json={
-                    "query": prompt, 
-                    "limit": search_limit,
-                    "qdrant_weight": 0.5,
-                    "elasticsearch_weight": 0.5
+                    "query": prompt,
+                    "session_id": st.session_state.session_id
                 },
                 headers={"x-token": SECRET_TOKEN}
             )
+            
             if response.status_code == 200:
-                results = response.json()
+                result = response.json()
                 
-                # Show cache status
-                if results.get('cached'):
-                    query_info = "⚡ **Cached result** (fast!)\n\n"
+                with st.chat_message("assistant"):
+                    # Display agent's answer
+                    st.write(result["answer"])
+                    
+                    # Show tool trace in expander if tools were used
+                    if result.get("tool_calls") and len(result["tool_calls"]) > 0:
+                        with st.expander("🔧 Agent Actions", expanded=False):
+                            st.markdown(f"**Iterations:** {result['iterations']}")
+                            for i, tool_call in enumerate(result["tool_calls"], 1):
+                                st.markdown(f"**{i}. {tool_call['tool']}**")
+                                st.json(tool_call["args"])
+                                st.caption(f"Found {tool_call['result_count']} results")
                 
-                if results['results']:
-                    context_parts = []
-                    for result in results['results']:
-                        context_parts.append(f"[{result['title']}]\n{result['content']}")
-                    context = "\n\n".join(context_parts)
+                # Add to display state
+                st.session_state.messages.append({
+                    "role": "assistant",
+                    "content": result["answer"]
+                })
+            else:
+                st.error(f"Agent error: {response.status_code}")
+                
         except Exception as e:
-            st.error(f"Search error: {str(e)}")
-    
-    # Generate response
-    with st.chat_message("assistant"):
-        # Show query processing info if available
-        if query_info:
-            st.markdown(query_info)
-        
-        messages = [{
-            "role": "system", 
-            "content": "You are a helpful assistant. When users ask about what you said earlier, refer to your previous messages in this conversation."
-        }]
-        
-        if context:
-            messages.append({
-                "role": "system",
-                "content": f"Context:\n{context}\n\nUse this to answer."
-            })
-        
-        # Add conversation history from memory (previous turns only)
-        conversation_history = st.session_state.memory.get_history(st.session_state.session_id)
-        messages.extend(conversation_history)
-        
-        # Add current user message
-        messages.append({"role": "user", "content": prompt})
-
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=messages,
-                temperature=0.7
-            )
-            reply = response.choices[0].message.content
-            st.write(reply)
-            
-            # Add both user message and assistant reply to memory
-            st.session_state.memory.add_message(st.session_state.session_id, "user", prompt)
-            st.session_state.memory.add_message(st.session_state.session_id, "assistant", reply)
-            
-            # Add to display state
-            st.session_state.messages.append({"role": "assistant", "content": reply})
-        except Exception as e:
-            error_msg = f"Error: {str(e)}"
+            error_msg = f"Agent error: {str(e)}"
             st.error(error_msg)
             st.session_state.messages.append({"role": "assistant", "content": error_msg})
+    
+    else:
+        # Fallback: direct OpenAI call without RAG
+        with st.chat_message("assistant"):
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7
+                )
+                reply = response.choices[0].message.content
+                st.write(reply)
+                st.session_state.messages.append({"role": "assistant", "content": reply})
+                
+            except Exception as e:
+                error_msg = f"Error: {str(e)}"
+                st.error(error_msg)
+                st.session_state.messages.append({"role": "assistant", "content": error_msg})

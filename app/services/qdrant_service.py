@@ -1,7 +1,7 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 from ..config import settings
-from .openai_service import get_embeddings
+from .openai_service import OpenAIService
 from datetime import datetime
 import logging
 import uuid
@@ -35,7 +35,7 @@ class QdrantService:
         """Store document chunks with OpenAI embeddings in Qdrant."""
         self._ensure_collection_exists()
         try:
-            embeddings = get_embeddings(chunks)
+            embeddings = OpenAIService().get_embeddings(chunks)
             points = []
             
             for i, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
@@ -71,7 +71,7 @@ class QdrantService:
         self._ensure_collection_exists()
         try:
             # Use OpenAI embeddings for consistency with document upload
-            vector = get_embeddings([text])[0]
+            vector = OpenAIService().get_embeddings([text])[0]
 
             # Search for closest vectors in the collection
             search_result = self.qdrant_client.query_points(

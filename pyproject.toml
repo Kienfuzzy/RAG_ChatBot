@@ -33,6 +33,7 @@ dotenv = "^0.9.9"
 poetry = "^2.2.1"
 elasticsearch = "8.11.0"
 redis = "^7.1.0"
+mysql-connector-python = "^9.5.0"
 
 
 [build-system]

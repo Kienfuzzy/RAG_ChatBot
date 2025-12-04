@@ -16,3 +16,4 @@ dotenv
 poetry
 elasticsearch
 redis
+mysql-connector-python
